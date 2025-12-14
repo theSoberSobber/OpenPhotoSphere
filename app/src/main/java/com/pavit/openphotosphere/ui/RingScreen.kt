@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import kotlin.math.sqrt
@@ -50,7 +51,9 @@ fun RingScreen() {
         val cx = size.width / 2f
         val cy = size.height / 2f
         val focal = size.width * 0.8f
-        val dotRadius = 16f
+        val holeRadius = 56f
+        val rectHalf = 150f
+        val rectStroke = 10f
 
         fun project(p: Vec3): Offset? {
             val cam = RingProjector.worldToCamera(p, pose.rotationMatrix)
@@ -70,14 +73,14 @@ fun RingScreen() {
                 val proj = project(p)
                 proj?.let { curr ->
                     prev?.let {
-                        drawLine(color = color, start = it, end = curr, strokeWidth = 3f)
+                        drawLine(color = color, start = it, end = curr, strokeWidth = 8f)
                     }
                     if (first == null) first = curr
                     prev = curr
                 }
             }
             if (first != null && prev != null && first != prev) {
-                drawLine(color = color, start = prev!!, end = first!!, strokeWidth = 3f)
+                drawLine(color = color, start = prev!!, end = first!!, strokeWidth = 8f)
             }
         }
 
@@ -89,37 +92,65 @@ fun RingScreen() {
         // Ray-sphere intersection to find where the camera looks on the sphere (centered at origin).
         val disc = radius * radius // for center at origin and |forwardDir|=1, t=radius
         val lookPoint = forwardDir * radius
-        val look2d = lookPoint?.let { project(it) }
-        if (look2d != null) {
-            drawCircle(color = Color.Red, radius = dotRadius * 0.9f, center = look2d)
-        }
-
         // Draw arrow to nearest point on sphere to the look point.
         val nearest = lookPoint?.let { lp ->
             allPoints.minByOrNull { p -> (p - lp).length() }
         }
         val nearest2d = nearest?.let { project(it) }
+        fun lerpColor(a: Color, b: Color, t: Float): Color {
+            val clamped = t.coerceIn(0f, 1f)
+            return Color(
+                red = a.red + (b.red - a.red) * clamped,
+                green = a.green + (b.green - a.green) * clamped,
+                blue = a.blue + (b.blue - a.blue) * clamped,
+                alpha = a.alpha + (b.alpha - a.alpha) * clamped
+            )
+        }
+
+        fun drawTarget(p: Vec3, base: Color) {
+            val align = forwardDir.dot(p.norm()).coerceIn(-1f, 1f)
+            val hit = ((align - 0.9f) / 0.1f).coerceIn(0f, 1f) // lights up when within ~25° cone
+            val fillColor = lerpColor(base.copy(alpha = 0.35f), Color(0xFF66FF66), hit)
+            val strokeColor = lerpColor(base, Color(0xFF00FF00), hit)
+            project(p)?.let { c ->
+                val topLeft = Offset(c.x - rectHalf, c.y - rectHalf)
+                val size = Size(rectHalf * 2f, rectHalf * 2f)
+                drawRect(color = fillColor, topLeft = topLeft, size = size)
+                drawRect(
+                    color = strokeColor,
+                    topLeft = topLeft,
+                    size = size,
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = rectStroke)
+                )
+                drawCircle(color = Color.White, radius = holeRadius, center = c)
+            }
+        }
+
+        // Draw targets (rectangles with holes). Points on each ring are equally spaced by construction.
+        allPoints.forEach { p ->
+            drawTarget(p, Color(0xFF2E7D32))
+        }
+
+        val look2d = lookPoint?.let { project(it) }
+        val lookRadius = holeRadius * 0.7f // smaller than hole, drawn on top
+        look2d?.let {
+            drawCircle(color = Color.Red, radius = lookRadius, center = it)
+        }
+
         if (look2d != null && nearest2d != null) {
-            drawLine(color = Color.Blue, start = look2d, end = nearest2d, strokeWidth = 4f)
+            drawLine(color = Color.Blue, start = look2d, end = nearest2d, strokeWidth = 8f)
 
             val dir = nearest2d - look2d
             val len = dir.getDistance()
             if (len > 1f) {
                 val norm = Offset(dir.x / len, dir.y / len)
-                val headLength = 18f
-                val headWidth = 12f
+                val headLength = 32f
+                val headWidth = 22f
                 val tip = nearest2d
                 val base = tip - norm * headLength
                 val perp = Offset(-norm.y, norm.x) * headWidth
-                drawLine(color = Color.Blue, start = tip, end = base + perp, strokeWidth = 4f)
-                drawLine(color = Color.Blue, start = tip, end = base - perp, strokeWidth = 4f)
-            }
-        }
-
-        // Draw points (green). Points on each ring are equally spaced by construction.
-        allPoints.forEach { p ->
-            project(p)?.let { c ->
-                drawCircle(color = Color.Green, radius = dotRadius, center = c)
+                drawLine(color = Color.Blue, start = tip, end = base + perp, strokeWidth = 8f)
+                drawLine(color = Color.Blue, start = tip, end = base - perp, strokeWidth = 8f)
             }
         }
     }
