@@ -33,19 +33,19 @@ object RingProjector {
     }
 
     fun generateRing(
-        gravity: Vec3,
+        normal: Vec3,
         center: Vec3 = Vec3(0f, 0f, 0f),
         radius: Float = 1f,
-        segments: Int = 180
+        count: Int = 180
     ): List<Vec3> {
-        val g = gravity.norm()
+        val g = normal.norm()
         val a = if (abs(g.z) < 0.9f) Vec3(0f, 0f, 1f) else Vec3(0f, 1f, 0f)
 
         val u = g.cross(a).norm()
         val v = g.cross(u).norm()
 
-        return (0..segments).map { i ->
-            val t = (2 * Math.PI * i / segments).toFloat()
+        return (0 until count).map { i ->
+            val t = (2 * Math.PI * i / count).toFloat()
             center + (u * cos(t) + v * sin(t)) * radius
         }
     }
