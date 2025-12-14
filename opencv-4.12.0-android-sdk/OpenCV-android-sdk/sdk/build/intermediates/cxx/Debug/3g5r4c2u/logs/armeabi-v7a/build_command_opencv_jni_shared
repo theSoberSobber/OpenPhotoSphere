@@ -1,0 +1,4 @@
+/Users/pavchhab/Library/Android/sdk/cmake/3.22.1/bin/ninja \
+  -C \
+  /Users/pavchhab/other/stitching/OpenPhotosphere/opencv-4.12.0-android-sdk/OpenCV-android-sdk/sdk/.cxx/Debug/3g5r4c2u/armeabi-v7a \
+  opencv_jni_shared

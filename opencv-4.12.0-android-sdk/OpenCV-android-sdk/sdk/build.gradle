@@ -203,3 +203,10 @@ publishing {
 
 dependencies {
 }
+
+// Keep Kotlin and Java targets aligned to avoid JVM-target mismatch errors
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}

@@ -1,0 +1,2 @@
+ninja: Entering directory `/Users/pavchhab/other/stitching/OpenPhotosphere/opencv-4.12.0-android-sdk/OpenCV-android-sdk/sdk/.cxx/Debug/3g5r4c2u/x86_64'
+ninja: no work to do.

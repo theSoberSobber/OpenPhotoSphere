@@ -1,0 +1,17 @@
+{
+  "installationFolder": "/Users/pavchhab/other/stitching/OpenPhotosphere/opencv-4.12.0-android-sdk/OpenCV-android-sdk/sdk/build/intermediates/prefab_package/release/prefab",
+  "gradlePath": ":opencv",
+  "packageInfo": {
+    "packageName": "opencv",
+    "packageSchemaVersion": 2,
+    "packageDependencies": [],
+    "modules": [
+      {
+        "moduleName": "opencv_jni_shared",
+        "moduleHeaders": "/Users/pavchhab/other/stitching/OpenPhotosphere/opencv-4.12.0-android-sdk/OpenCV-android-sdk/sdk/native/jni/include",
+        "moduleExportLibraries": [],
+        "abis": []
+      }
+    ]
+  }
+}

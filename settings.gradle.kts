@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Open Photosphere"
 include(":app")
+include(":opencv")
+project(":opencv").projectDir = File(rootDir, "opencv-4.12.0-android-sdk/OpenCV-android-sdk/sdk")

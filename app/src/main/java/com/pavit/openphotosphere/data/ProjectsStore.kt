@@ -23,7 +23,8 @@ class ProjectsStore(private val context: Context) {
             Project(
                 id = obj.getString("id"),
                 name = obj.getString("name"),
-                photos = photos
+                photos = photos,
+                panoramaPath = obj.optString("panoramaPath").takeIf { it.isNotBlank() }
             )
         }
     }
@@ -37,6 +38,7 @@ class ProjectsStore(private val context: Context) {
             val photos = JSONArray()
             p.photos.forEach { photos.put(it) }
             obj.put("photos", photos)
+            p.panoramaPath?.let { obj.put("panoramaPath", it) }
             arr.put(obj)
         }
         file.writeText(arr.toString())
